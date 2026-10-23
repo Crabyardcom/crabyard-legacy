@@ -7,7 +7,7 @@ description: Install Crabyard and its prerequisites.
 
 Crabyard generates Tauri v2 apps, so you need the Tauri development toolchain installed:
 
-- **Rust** 1.88+ — [rustup.rs](https://rustup.rs/)
+- **Rust** 1.90+ — [rustup.rs](https://rustup.rs/)
 - **Bun** 1.1+ — [bun.sh](https://bun.sh/)
 - **Git** — [git-scm.com](https://git-scm.com/)
 
@@ -49,6 +49,8 @@ irm https://crabyard.dev/install.ps1 | iex
 **From source:**
 
 ```sh
+git clone https://github.com/Crabyardcom/crabyard-cli
+cd crabyard-cli
 cargo install --path .
 ```
 
@@ -65,11 +67,13 @@ This checks all prerequisites: Rust, Cargo, Bun, Git, Tauri CLI, and platform-sp
 Purchase a license at [crabyard.dev](https://crabyard.dev) and set your key:
 
 ```sh
-export CRABYARD_LICENSE_KEY=TK-...
+export CRABYARD_LICENSE_KEY=CRAB-...
 ```
 
 Or pass it directly when generating:
 
 ```sh
-crabyard new "My App" --license-key TK-...
+crabyard new "My App" --license-key CRAB-...
 ```
+
+Existing `TK-` license keys remain valid. Local generation with `--template /path/to/crabyard-templates` uses the checked-out templates directly.

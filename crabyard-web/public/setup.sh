@@ -1,132 +1,41 @@
 #!/bin/sh
 set -eu
 
-# Usage: curl -fsSL https://crabyard.dev/setup.sh | sh
-
-API_BASE="https://taurikit-api-production.up.railway.app"
-BIN_NAME="crabyard"
+API_BASE="${CRABYARD_API_URL:-https://crabyard-api-production.up.railway.app}"
 INSTALL_DIR="${CRABYARD_INSTALL_DIR:-$HOME/.crabyard/bin}"
+INSTALLER_URL="https://crabyard.dev/install.sh"
 
-main() {
-    if command -v "$BIN_NAME" > /dev/null 2>&1; then
-        local latest current
-        latest="$(fetch_latest_version)"
-        current="$(get_installed_version)"
-        if [ -n "$current" ] && [ "$current" != "$latest" ]; then
-            printf "Updating crabyard %s -> %s...\n" "$current" "$latest"
-            install_cli
-        else
-            printf "crabyard %s is up to date.\n" "$current"
-        fi
-    else
-        install_cli
-    fi
-
-    ensure_bun
-
-    printf "\nStarting project wizard...\n\n"
-    exec "${INSTALL_DIR}/${BIN_NAME}" new "$@" 0<&1
-}
-
-get_installed_version() {
-    "$BIN_NAME" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' || echo ""
-}
-
-install_cli() {
-    need_cmd curl
-    need_cmd tar
-    need_cmd uname
-
-    local os arch target
-    os="$(detect_os)"
-    arch="$(detect_arch)"
-    target="${arch}-${os}"
-
-    local version
-    version="${CRABYARD_VERSION:-$(fetch_latest_version)}"
-
-    printf "Installing crabyard %s (%s)...\n" "$version" "$target"
-
-    local url="${API_BASE}/cli/download/${target}?version=${version}"
-    local tmpdir
-    tmpdir="$(mktemp -d)"
-    trap 'rm -rf "$tmpdir"' EXIT
-
-    printf "  Downloading %s\n" "$url"
-    curl -fsSL "$url" -o "${tmpdir}/crabyard.tar.gz"
-    tar xzf "${tmpdir}/crabyard.tar.gz" -C "$tmpdir"
-
-    mkdir -p "$INSTALL_DIR"
-    mv "${tmpdir}/${BIN_NAME}" "${INSTALL_DIR}/${BIN_NAME}"
-    chmod +x "${INSTALL_DIR}/${BIN_NAME}"
-
-    printf "  Installed to %s/%s\n" "$INSTALL_DIR" "$BIN_NAME"
-
-    if ! echo "$PATH" | tr ':' '\n' | grep -qx "$INSTALL_DIR"; then
-        export PATH="${INSTALL_DIR}:$PATH"
-        add_to_shell_profile "$INSTALL_DIR"
-    fi
-}
-
-detect_os() {
-    case "$(uname -s)" in
-        Linux*)  echo "unknown-linux-gnu" ;;
-        Darwin*) echo "apple-darwin" ;;
-        MINGW*|MSYS*|CYGWIN*) echo "pc-windows-msvc" ;;
-        *) err "Unsupported OS: $(uname -s)" ;;
-    esac
-}
-
-detect_arch() {
-    case "$(uname -m)" in
-        x86_64|amd64)   echo "x86_64" ;;
-        aarch64|arm64)  echo "aarch64" ;;
-        *) err "Unsupported architecture: $(uname -m)" ;;
-    esac
-}
-
-fetch_latest_version() {
-    curl -fsSL "${API_BASE}/cli/latest" | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p'
-}
-
-add_to_shell_profile() {
-    local dir="$1"
-    local line="export PATH=\"${dir}:\$PATH\""
-    local profile=""
-
-    if [ -n "${ZSH_VERSION:-}" ] || [ -f "$HOME/.zshrc" ]; then
-        profile="$HOME/.zshrc"
-    elif [ -f "$HOME/.bashrc" ]; then
-        profile="$HOME/.bashrc"
-    elif [ -f "$HOME/.profile" ]; then
-        profile="$HOME/.profile"
-    fi
-
-    if [ -n "$profile" ] && ! grep -qF "$dir" "$profile" 2>/dev/null; then
-        printf "\n# Crabyard\n%s\n" "$line" >> "$profile"
-        printf "  Added to %s\n" "$profile"
-    fi
-}
-
-need_cmd() {
-    if ! command -v "$1" > /dev/null 2>&1; then
-        err "Required command '$1' not found"
-    fi
-}
-
-ensure_bun() {
-    if command -v bun > /dev/null 2>&1; then
-        return
-    fi
-    printf "Installing bun...\n"
-    curl -fsSL https://bun.sh/install | bash
+command -v curl >/dev/null 2>&1 || { printf 'error: curl is required\n' >&2; exit 1; }
+version="${CRABYARD_VERSION:-$(curl -fsSL --retry 3 --connect-timeout 10 "${API_BASE%/}/cli/latest" | sed -n 's/.*"version": *"\([^"]*\)".*/\1/p')}"
+[ -n "$version" ] || { printf 'error: Could not determine the CLI release version\n' >&2; exit 1; }
+cli="$(command -v crabyard || true)"
+current=""
+if [ -n "$cli" ]; then
+    current="$("$cli" --version 2>/dev/null | awk '{ print $NF }')"
+fi
+if [ -z "$cli" ] || [ "${current#v}" != "${version#v}" ]; then
+    installer="$(mktemp)"
+    trap 'rm -f "$installer"' 0
+    trap 'exit 1' HUP INT TERM
+    curl -fsSL --retry 3 --connect-timeout 10 "$INSTALLER_URL" -o "$installer"
+    CRABYARD_VERSION="$version" sh "$installer"
+    cli="${INSTALL_DIR}/crabyard"
+fi
+if ! command -v bun >/dev/null 2>&1; then
+    command -v bash >/dev/null 2>&1 || { printf 'error: bash is required to install Bun\n' >&2; exit 1; }
+    bun_installer="$(mktemp)"
+    curl -fsSL --retry 3 --connect-timeout 10 https://bun.sh/install -o "$bun_installer"
+    bash "$bun_installer"
+    rm -f "$bun_installer"
     export BUN_INSTALL="${BUN_INSTALL:-$HOME/.bun}"
     export PATH="$BUN_INSTALL/bin:$PATH"
-}
-
-err() {
-    printf "error: %s\n" "$1" >&2
+fi
+printf '\nStarting project wizard...\n\n'
+if [ -t 0 ]; then
+    exec "$cli" new "$@"
+elif [ -t 1 ]; then
+    exec "$cli" new "$@" </dev/tty
+else
+    printf 'error: Run crabyard new from an interactive terminal, or pass CLI flags directly\n' >&2
     exit 1
-}
-
-main "$@"
+fi

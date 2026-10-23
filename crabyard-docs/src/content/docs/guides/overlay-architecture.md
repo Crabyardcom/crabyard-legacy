@@ -25,7 +25,7 @@ base/                 ← Core app (always copied first)
 
 ## Base Template
 
-The base scaffold at `scaffold/base/` contains:
+The base scaffold at `base/` in [crabyard-templates](https://github.com/Crabyardcom/crabyard-templates) contains:
 
 - React 19 entry point (`main.tsx`, `App.tsx`)
 - Zustand store with marker comments for auth injection

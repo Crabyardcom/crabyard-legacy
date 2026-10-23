@@ -1,43 +1,20 @@
-# Astro Starter Kit: Minimal
+# Crabyard Web
+
+The [Crabyard](https://crabyard.dev) marketing site and verified CLI installers. Standalone repository: [Crabyardcom/crabyard-web](https://github.com/Crabyardcom/crabyard-web).
 
 ```sh
-bun create astro@latest -- --template minimal
+bun install --frozen-lockfile
+bun run dev
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Next.js serves the local site at `http://localhost:3000`. Edit pages in `src/app`, shared sections in `src/components`, and installers in `public`.
 
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+```sh
+bun run check
+bun run build
+docker build -t crabyard-web .
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+The Dockerfile builds and serves Next.js standalone output from this repository's root. Deploy with port 3000 (or Railway's `PORT`) and `/` as the health check. The API and documentation have separate repositories and deployments.
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
-
-Any static assets, like images, can be placed in the `public/` directory.
-
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+Installers use the Crabyard API release proxy and require per-archive `.sha256` release sidecars. `CRABYARD_API_URL`, `CRABYARD_INSTALL_DIR`, and `CRABYARD_VERSION` override the API URL, install destination, and release tag. The CLI release source is [crabyard-cli](https://github.com/Crabyardcom/crabyard-cli).

@@ -7,7 +7,7 @@ export default defineConfig({
 	integrations: [
 		starlight({
 			title: 'Crabyard',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/tCoOpy/crabyard' }],
+			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/Crabyardcom/crabyard-cli' }],
 			customCss: [],
 			sidebar: [
 				{

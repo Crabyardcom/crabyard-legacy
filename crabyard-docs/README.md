@@ -1,49 +1,21 @@
-# Starlight Starter Kit: Basics
+# Crabyard Documentation
 
-[![Built with Starlight](https://astro.badg.es/v2/built-with-starlight/tiny.svg)](https://starlight.astro.build)
+The [Crabyard documentation](https://docs.crabyard.dev), built with Astro and Starlight. Standalone repository: [Crabyardcom/crabyard-docs](https://github.com/Crabyardcom/crabyard-docs).
 
-```
-bun create astro@latest -- --template starlight
-```
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
-├── src/
-│   ├── assets/
-│   ├── content/
-│   │   └── docs/
-│   └── content.config.ts
-├── astro.config.mjs
-├── package.json
-└── tsconfig.json
+```sh
+bun install --frozen-lockfile
+bun run dev
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
+Edit Markdown and MDX pages in `src/content/docs`. Navigation and site metadata live in `astro.config.mjs`.
 
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
+```sh
+bun test
+bun run build
+bun run start
+docker build -t crabyard-docs .
+```
 
-Static assets, like favicons, can be placed in the `public/` directory.
+The Dockerfile builds static pages and serves them with Bun on Railway's `PORT` or port 3000. Use this repository's root as the build context and `/` for the health check. The static server supports GET and HEAD and confines requests to the built `dist` directory.
 
-## 🧞 Commands
-
-All commands are run from the root of the project, from a terminal:
-
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+The generator lives in [crabyard-cli](https://github.com/Crabyardcom/crabyard-cli); its source templates live in [crabyard-templates](https://github.com/Crabyardcom/crabyard-templates). Keep command examples and generated file descriptions aligned with those repositories.

@@ -49,7 +49,7 @@ This opens a system dialog. Click **Install** and wait for the download to compl
 
 ### Rust version too old
 
-Crabyard requires Rust ≥ 1.88. Update via rustup:
+Crabyard requires Rust ≥ 1.90. Update via rustup:
 
 ```sh
 rustup update stable
@@ -102,7 +102,7 @@ The cached template may be corrupted or outdated.
 ### `License server unreachable`
 
 - Check your internet connection
-- The API at `taurikit-api-production.up.railway.app` may be temporarily down
+- The API at `crabyard-api-production.up.railway.app` may be temporarily down
 - If you have a cached template, generation will use the cached version automatically
 
 ### WebView2 installation hangs (Windows)

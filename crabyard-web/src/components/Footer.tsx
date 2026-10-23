@@ -64,7 +64,7 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="https://github.com/tCoOpy/crabyard"
+                  href="https://github.com/Crabyardcom/crabyard-cli"
                   className="hover:text-zinc-300 transition-colors"
                   target="_blank"
                   rel="noopener noreferrer"
@@ -108,7 +108,7 @@ export default function Footer() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/tCoOpy/crabyard"
+              href="https://github.com/Crabyardcom/crabyard-cli"
               className="text-zinc-700 hover:text-zinc-400 transition-colors"
               aria-label="GitHub"
               target="_blank"

@@ -9,5 +9,6 @@ FROM oven/bun:1
 WORKDIR /app
 COPY --from=build /app/dist ./dist
 COPY server.ts .
+COPY src/server/ src/server/
 EXPOSE 3000
 CMD ["bun", "server.ts"]

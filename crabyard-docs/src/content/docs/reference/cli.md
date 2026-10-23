@@ -29,6 +29,9 @@ crabyard new [APP_NAME] [OPTIONS]
 | `--author <NAME>` | Author name | Empty |
 | `--description <DESC>` | Short description | Empty |
 | `--template <DIR>` | Path to a local template directory | API download |
+| `--recipe <FILE>` | Reuse a generated `crabyard.recipe.toml` | None |
+| `--preset <NAME>` | Apply `minimal`, `desktop`, or `local-first` defaults | None |
+| `--dry-run` | Print a JSON generation plan without downloading, installing, or writing files | `false` |
 | `--output <DIR>` | Output directory | `./<app-slug>` |
 | `--license-key <KEY>` | License key for template download | `$CRABYARD_LICENSE_KEY` |
 | `--yes` / `-y` | Accept all defaults without prompting | `false` |
@@ -60,6 +63,28 @@ crabyard new "My App" --auth github --ui shadcn --yes
 crabyard new "My App" --template ./my-scaffold --yes --no-install
 ```
 
+### Presets and reproducible recipes
+
+```sh
+crabyard presets
+crabyard presets --json
+crabyard new "My App" --preset desktop --yes
+crabyard new "Local Notes" --preset local-first --dry-run
+crabyard new --recipe ./my-app/crabyard.recipe.toml --output ./another-app --yes
+```
+
+`minimal` selects no authentication and the minimal UI. `desktop` adds shadcn, logging, saved window state, and notifications. `local-first` selects shadcn, SQLite, logging, saved window state, and a command palette.
+
+Every generated app includes `crabyard.recipe.toml` with its selected stack and app metadata. Commit the recipe to reproduce that selection. Explicit flags override recipe fields. Recipes reject unknown fields and exclude license keys and machine paths.
+
+For source generation in CI, use a local checkout of [crabyard-templates](https://github.com/Crabyardcom/crabyard-templates):
+
+```sh
+crabyard new "CI App" --template ../crabyard-templates --preset minimal --yes --no-install --no-git
+```
+
+This path does not prompt or install desktop toolchains. Building the generated app still requires the platform prerequisites.
+
 ---
 
 ## `crabyard doctor`
@@ -74,7 +99,7 @@ Verifies the following are installed and meet minimum versions:
 
 | Check | Minimum |
 |-------|---------|
-| Rust | 1.88 |
+| Rust | 1.90 |
 | Cargo | (any) |
 | Bun | 1.1 |
 | Git | (any) |

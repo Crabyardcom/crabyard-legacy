@@ -81,7 +81,7 @@ daisyui: {
 
 ## tesign
 
-[tesign](https://github.com/tCoOpy/tesign) (`@slideup/design`) is a custom component library with a shadcn-compatible API. It includes components adapted for desktop apps with built-in theming.
+[tesign](https://github.com/Crabyardcom/tesign) (`@slideup/design`) is a custom component library with a shadcn-compatible API. It includes components adapted for desktop apps with built-in theming.
 
 ### What's included
 
